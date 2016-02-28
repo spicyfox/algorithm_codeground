@@ -9,16 +9,24 @@ int *DATA;
 int N;
 int S;
 
-int solve_dfs(int depth, int remain, int sum) {
-	if (remain == 0) {
-		return sum;
+bool *VISITED;
+
+int RESULT;
+
+void solve(int depth, int sum) {
+
+	if (depth == S) {
+		if (RESULT < sum) {
+			RESULT = sum;
+		}
+		return;
 	}
 
-	if (remain > 0 && depth == N) {
-		return 0;
+	for(int i = 0; i < N && VISITED[i] == false; i++) {
+		VISITED[i] = true;
+		solve(depth + 1, sum + DATA[i]);
+		VISITED[i] = false;
 	}
-
-	return MAX(solve_dfs(depth + 1, remain - 1, sum + DATA[depth]), solve_dfs(depth + 1, remain, sum));
 }
 
 int main(int argc, char** argv) {
@@ -40,14 +48,22 @@ int main(int argc, char** argv) {
 		// 이 부분에서 알고리즘 프로그램을 작성하십시오.
 		scanf("%d %d", &N, &S);    
        	DATA = new int[N];
+       	VISITED = new bool[N];
+       	RESULT = 0;
+       	for(int i = 0; i < N; i ++) {
+       		VISITED[i] = false;
+       	}
+
        	for(int i = 0; i < N; i++) {
        		scanf("%d", &DATA[i]);
        	}
 		// 이 부분에서 정답을 출력하십시오.
 		printf("Case #%d\n", test_case);	// cout 사용 가능
-		printf("%d\n", solve_dfs(0, S, 0));
+		solve(0, 0);
+		printf("%d\n", RESULT);
 
 		delete[] DATA;        
+		delete[] VISITED;
 	}
 
 	return 0;	// 정상종료 시 반드시 0을 리턴해야 합니다.
