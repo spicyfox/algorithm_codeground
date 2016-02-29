@@ -1,34 +1,42 @@
-// 아래 기본 제공된 코드를 수정 또는 삭제하고 본인이 코드를 사용하셔도 됩니다.
+	// 아래 기본 제공된 코드를 수정 또는 삭제하고 본인이 코드를 사용하셔도 됩니다.
 #include <cstdio>
 #include <iostream>
 using namespace std;
 
-#define MAX(a, b) ((a) > (b) ? (a):(b))
-
 int *DATA;
-int N;
-int S;
+int N, K;
 
-bool *VISITED;
+void swap(int a, int b) {
+	int t = DATA[a];
+	DATA[a] = DATA[b];
+	DATA[b] = t;
+}
 
-int RESULT;
+void quick_sort(int s, int e) {
 
-void solve(int depth, int sum) {
-
-	if (depth == S) {
-		if (RESULT < sum) {
-			RESULT = sum;
+	if(s < e) {
+		int p = s, l = s + 1, r = e;
+		while(l <= r) {
+			while(l <= e && DATA[l] <= DATA[p]) l++;
+			while(r >= s+1 && DATA[r] >= DATA[p]) r--;
+			if(l < r) swap(l, r);
 		}
-		return;
-	}
 
-	for(int i = 0; i < N && VISITED[i] == false; i++) {
-		VISITED[i] = true;
-		solve(depth + 1, sum + DATA[i]);
-		VISITED[i] = false;
+		swap(p, r);
+		quick_sort(s, r - 1);
+		quick_sort(r + 1, e);
 	}
 }
 
+int solve() {
+	int result = 0;
+	quick_sort(0, N - 1);
+	for(int i = 0; i < K; i++) {
+		result += DATA[N - i - 1];
+	}
+
+	return result;
+}
 
 int main(int argc, char** argv) {
 	/* 아래 freopen 함수는 input.txt 를 read only 형식으로 연 후,
@@ -47,24 +55,18 @@ int main(int argc, char** argv) {
 	scanf("%d", &TC);	// cin 사용 가능
 	for(test_case = 1; test_case <= TC; test_case++) {
 		// 이 부분에서 알고리즘 프로그램을 작성하십시오.
-		scanf("%d %d", &N, &S);    
-       	DATA = new int[N];
-       	VISITED = new bool[N];
-       	RESULT = 0;
-       	for(int i = 0; i < N; i ++) {
-       		VISITED[i] = false;
-       	}
-
-       	for(int i = 0; i < N; i++) {
-       		scanf("%d", &DATA[i]);
-       	}
+		scanf("%d %d", &N, &K);
+		DATA = new int[N];
+		for(int i = 0; i < N; i++) {
+			scanf("%d", &DATA[i]);
+		}   
+        
 		// 이 부분에서 정답을 출력하십시오.
 		printf("Case #%d\n", test_case);	// cout 사용 가능
-		solve(0, 0);
-		printf("%d\n", RESULT);
+		printf("%d\n", solve());
 
-		delete[] DATA;        
-		delete[] VISITED;
+		delete[] DATA;
+        
 	}
 
 	return 0;	// 정상종료 시 반드시 0을 리턴해야 합니다.
