@@ -1,4 +1,4 @@
-// 아래 기본 제공된 코드를 수정 또는 삭제하고 본인이 코드를 사용하셔도 됩니다.
+
 #include <cstdio>
 #include <iostream>
 using namespace std;
@@ -7,8 +7,45 @@ int N, K;
 
 #define ULLONG unsigned long long
 
+ULLONG* LINE;
+
+
+void init_line() {
+	LINE[0] = 0;
+	for (int i = 1; i < N * 2; i++) {
+		if (i <= N) {
+			LINE[i] = i + LINE[i - 1];
+		} else {
+			LINE[i] = N - (i % N) + LINE[i - 1];
+		}
+	}
+}
+
 
 ULLONG get_number(int line, int r, int c) {
+
+	//printf("[%d] %d, %d\n", line, r, c);
+	ULLONG num = 0;
+	num = LINE[line - 1];
+	if (line <= N) {
+		if (line % 2 == 0) {
+			num += line - c;
+		} else {
+			num += c + 1;
+		}
+	} else {	// line > N
+		if (line % 2 == 0) {
+			num +=  N - (line % N) - (c - (line % N));
+		} else {
+			num +=  c - ((line % N)) + 1;
+		}
+	}
+
+	return num;
+}
+
+
+ULLONG get_number_legacy(int line, int r, int c) {
 
 	//printf("[%d] %d, %d\n", line, r, c);
 	ULLONG num = 0;
@@ -24,13 +61,13 @@ ULLONG get_number(int line, int r, int c) {
 		}
 	} else {	// line > N
 		int i = 1;
-		for(; i <= N; i++) {
+		for (; i <= N; i++) {
 			num += i;
 		}
-		for(; i < line; i++) {
+		for (; i < line; i++) {
 			num +=  N - (i % N);
 		}
-		if (line % 2 == 0){
+		if (line % 2 == 0) {
 			num +=  N - (line % N) - (c - (line % N));
 		} else {
 			num +=  c - ((line % N)) + 1;
@@ -43,6 +80,10 @@ ULLONG get_number(int line, int r, int c) {
 ULLONG solve() {
 
 	scanf("%d %d", &N, &K);
+
+	LINE = new ULLONG[N * 2];
+	init_line();
+
 	char ch;
 	int count = K;
 	int r = 0, c = 0;
@@ -50,29 +91,34 @@ ULLONG solve() {
 	ULLONG sum = 0l;
 	while (count > 0) {
 		scanf("%c", &ch);
-		if (ch == 'R' || ch == 'L' || ch == 'U' || ch == 'D') {
-			if (ch == 'R') {
-				c++;
-				line++;
-			} else if (ch == 'L') {
-				c--;
-				line--;
-			} else if (ch == 'U') {
-				r--;
-				line--;
-			} else if (ch == 'D') {
-				r++;
-				line++;
-			}
-			//intf("%c", ch);
+		bool read = true;
+		if (ch == 'R') {
+			c++;
+			line++;
+		} else if (ch == 'L') {
+			c--;
+			line--;
+		} else if (ch == 'U') {
+			r--;
+			line--;
+		} else if (ch == 'D') {
+			r++;
+			line++;
+		} else {
+			read = false;
+		}
+		//intf("%c", ch);
+		if (read) {
 			count--;
 			sum += get_number(line, r, c);
-
 		}
+
 	}
+	delete[] LINE;
+
 	//intf("\n");
 
-	return (1+sum);
+	return (1 + sum);
 }
 
 int main(int argc, char** argv) {
