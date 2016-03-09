@@ -1,10 +1,16 @@
 // 아래 기본 제공된 코드를 수정 또는 삭제하고 본인이 코드를 사용하셔도 됩니다.
 #include <cstdio>
 #include <iostream>
+#include <ctime>
 using namespace std;
 
+#define MAX(a, b) ((a) > (b) ? (a): (b))
+#define MIN(a, b) ((a) < (b) ? (a): (b))
+
 int N;
-int *DATA;
+int DATA[100000 + 2];
+
+unsigned long TOTAL;
 
 void show(int count) {
 	printf("#%d ", count);
@@ -18,33 +24,52 @@ int solve() {
 
 	int count = 0;
 	DATA[0] = DATA[N + 1] = 0;
-	show(0);
+	//show(0);
 
-	while(true) {
-		int hour_remove = 0;
+	while(TOTAL > 0) {
 		int prev = 0;
 		for(int i = 1; i <= N; i++) {
-
 			int remove = 0;
-			for(int j = DATA[i]; j >=1; j--) {
-				if (prev < j || DATA[i+1] < j || DATA[i] == j) {
+			if (DATA[i] > 0) {
+				int v = MIN(prev, DATA[i + 1]);
+				if (v < DATA[i]) {
+					remove = DATA[i] - v;
+				} else {
 					remove++;
 				}
-			}
-			hour_remove += remove;
+			} 
 			prev = DATA[i];
-			DATA[i] -= remove;
-		}
 
-		if (hour_remove == 0) {
-			break;
+			if (remove > 0) {
+				DATA[i] -= remove;
+				TOTAL -= remove;				
+			}
 		}
 
 		count++;
-		show(count);
+		//show(count);
 	}
 
 	return count;
+}
+
+int main2() {
+	unsigned long start = clock();
+	N = 100000;
+	setbuf(stdout, NULL);
+	
+	for (int test_case = 1; test_case <= 1; test_case++) {
+		TOTAL = 0;
+		for(int i = 1; i <=N; i++) {
+			DATA[i] = (rand() % 1000000000) + 1;
+			TOTAL += DATA[i];
+		}
+		// 이 부분에서 정답을 출력하십시오.
+		printf("Case #%d\n%d\n", test_case, solve());	// cout 사용 가능
+	}
+	printf("%f\n", (clock() - start) / (float)CLOCKS_PER_SEC);
+
+	return 0;
 }
 
 int main(int argc, char** argv) {
@@ -66,17 +91,17 @@ int main(int argc, char** argv) {
 		// 이 부분에서 알고리즘 프로그램을 작성하십시오.
         
         scanf("%d", &N);
-		DATA = new int[N + 2];        
+		TOTAL = 0;       
         for(int i = 1; i <= N; i++) {
         	scanf("%d", &DATA[i]);
+        	TOTAL += DATA[i];
         }
 
 		// 이 부분에서 정답을 출력하십시오.
 		printf("Case #%d\n%d\n", test_case, solve());	// cout 사용 가능
-
-		delete[] DATA;
         
 	}
+
 
 	return 0;	// 정상종료 시 반드시 0을 리턴해야 합니다.
 }
